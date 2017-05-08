@@ -47,9 +47,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         baseUtils = new BaseUtils();
         baseUtils.CallJavaMethod();
         baseUtils.CallJavaParamsMethod();
+
+        BaseUtils.CallJavaInstanceMethod();
+        BaseUtils.CallJavaStaticMethod();
+
+        ClassField classField = new ClassField();
+        classField.setNum(10);
+        classField.setStr("hello");
+
+        BaseUtils.UseInstanceField(classField);
+        BaseUtils.UseStaticField();
+
+        // 输出本地代码修改过后的值
+        System.out.println("In Java--->ClassField.num = " + classField.getNum());
+        System.out.println("In Java--->ClassField.str = " + classField.getStr());
+
         ButterKnife.bind(this);
-//        tv.setText(""+baseUtils.CallJavaSumMethod(3,5));
-//        tv.setText(baseUtils.HelloEve());
     }
 
     private void initView() {
@@ -69,10 +82,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvSum.setText("从1加到" + len + "总和是：" + sum);
     }
 
-    private void initArray(){
-        int[][] arr =baseUtils.initObjectArray(3);
-        for(int i=0;i<3;i++){
-            for(int j=0;j<3;j++){
+    private void initArray() {
+        int[][] arr = baseUtils.initObjectArray(3);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
                 System.out.format("%d ", arr[i][j]);
             }
             System.out.format("\n");

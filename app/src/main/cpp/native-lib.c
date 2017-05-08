@@ -52,43 +52,6 @@ Java_com_eve_basejni_BaseUtils_LinkEve(JNIEnv *env, jobject instance,
     return (*env)->NewStringUTF(env, buff);
 }
 
-/**
- * 在这个方法中，使用C代码调用JavaSimple中的sayHello方法，使用的是C的反射技术
- */
-JNIEXPORT void JNICALL
-Java_com_eve_basejni_BaseUtils_CallJavaMethod(JNIEnv *env, jobject instance) {
-    /*1，获取该类的字节码文件
-     * jclass      (*FindClass)(JNIEnv*, const char*);
-     * char*参数 传入的是全类名(需要把点（.)改成斜线（/）
-     *
-     * */
-    jclass clazz = (*env)->FindClass(env, "com/eve/basejni/BaseUtils");
-
-
-    /*2，获取该类的某一个方法对象（jmethodID）
-     * jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char* str1, const char* str2);
-     * jclass 要调用的java类的字节码
-     * str1 要调用的类的方法的方法名
-     * str2 对应的这个方法的签名（可以在该类的.class文件所在的根目录下执行命令行：javap -s 全类名（不包括.java））得到
-     * */
-    jmethodID methodId = (*env)->GetMethodID(env, clazz, "voidMethod", "()V");
-
-//    3，根据获取该类的实例对象
-    jobject javaSimple = (*env)->AllocObject(env, clazz);
-    //4，调用对应的方法
-    (*env)->CallVoidMethod(env, javaSimple, methodId);
-}
-
-//C调用JAVA里面 带参数的方法
-JNIEXPORT void JNICALL
-Java_com_eve_basejni_BaseUtils_CallJavaParamsMethod(JNIEnv *env, jobject instance) {
-    jclass clazz = (*env)->FindClass(env, "com/eve/basejni/BaseUtils");
-    jmethodID methodId = (*env)->GetMethodID(env, clazz, "paramsMethod", "(Ljava/lang/String;)V");
-    jobject obj = (*env)->AllocObject(env, clazz);
-    jstring text = (*env)->NewStringUTF(env, "this method has params");
-    (*env)->CallVoidMethod(env, obj, methodId, text);
-}
-
 
 /**
  * C调用java中的带参数的方法
@@ -148,31 +111,216 @@ JNIEXPORT jobjectArray JNICALL
 Java_com_eve_basejni_BaseUtils_initObjectArray(JNIEnv *env, jobject obj, jint size) {
     jobjectArray result;
     jclass clsIntArray;
-    jint i,j;
+    jint i, j;
     // 1.获得一个int型二维数组类的引用
-    clsIntArray = (*env)->FindClass(env,"[I");
-    if(clsIntArray == NULL){
+    clsIntArray = (*env)->FindClass(env, "[I");
+    if (clsIntArray == NULL) {
         return NULL;
     }
     // 2.创建一个数组对象（里面每个元素用clsIntArray表示）
-    result = (*env)->NewObjectArray(env,size,clsIntArray,NULL);
-    if(result == NULL){
+    result = (*env)->NewObjectArray(env, size, clsIntArray, NULL);
+    if (result == NULL) {
         return NULL;
     }
     // 3.为数组元素赋值
-    for(i=0;i<size;i++){
+    for (i = 0; i < size; i++) {
         jint buff[256];
-        jintArray intArr = (*env)->NewIntArray(env,size);
-        if(intArr == NULL){
+        jintArray intArr = (*env)->NewIntArray(env, size);
+        if (intArr == NULL) {
             return NULL;
         }
         for (int j = 0; j < size; j++) {
-            buff[j] = i+j;
+            buff[j] = i + j;
         }
-        (*env)->SetIntArrayRegion(env,intArr,0,size,buff);
-        (*env)->SetObjectArrayElement(env,result,i,intArr);
-        (*env)->DeleteLocalRef(env,intArr);
+        (*env)->SetIntArrayRegion(env, intArr, 0, size, buff);
+        (*env)->SetObjectArrayElement(env, result, i, intArr);
+        (*env)->DeleteLocalRef(env, intArr);
     }
     return result;
 }
 
+/**
+ * 在这个方法中，使用C代码调用JavaSimple中的sayHello方法，使用的是C的反射技术
+ */
+JNIEXPORT void JNICALL
+Java_com_eve_basejni_BaseUtils_CallJavaMethod(JNIEnv *env, jobject instance) {
+    /*1，获取该类的字节码文件
+     * jclass      (*FindClass)(JNIEnv*, const char*);
+     * char*参数 传入的是全类名(需要把点（.)改成斜线（/）
+     *
+     * */
+    jclass clazz = (*env)->FindClass(env, "com/eve/basejni/BaseUtils");
+
+
+    /*2，获取该类的某一个方法对象（jmethodID）
+     * jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char* str1, const char* str2);
+     * jclass 要调用的java类的字节码
+     * str1 要调用的类的方法的方法名
+     * str2 对应的这个方法的签名（可以在该类的.class文件所在的根目录下执行命令行：javap -s 全类名（不包括.java））得到
+     * */
+    jmethodID methodId = (*env)->GetMethodID(env, clazz, "voidMethod", "()V");
+
+//    3，根据获取该类的实例对象
+    jobject javaSimple = (*env)->AllocObject(env, clazz);
+    //4，调用对应的方法
+    (*env)->CallVoidMethod(env, javaSimple, methodId);
+}
+
+//C调用JAVA里面 带参数的方法
+JNIEXPORT void JNICALL
+Java_com_eve_basejni_BaseUtils_CallJavaParamsMethod(JNIEnv *env, jobject instance) {
+    jclass clazz = (*env)->FindClass(env, "com/eve/basejni/BaseUtils");
+    jmethodID methodId = (*env)->GetMethodID(env, clazz, "paramsMethod", "(Ljava/lang/String;)V");
+    jobject obj = (*env)->AllocObject(env, clazz);
+    jstring text = (*env)->NewStringUTF(env, "this method has params");
+    (*env)->CallVoidMethod(env, obj, methodId, text);
+}
+
+JNIEXPORT void JNICALL
+Java_com_eve_basejni_BaseUtils_CallJavaInstanceMethod(JNIEnv *env, jclass cls) {
+    jclass clazz = NULL;
+    jobject jobj = NULL;
+    jmethodID mid_construct = NULL;
+    jmethodID mid_instance = NULL;
+    jstring str_arg = NULL;
+
+    // 1、从classpath路径下搜索ClassMethod这个类，并返回该类的Class对象
+    clazz = (*env)->FindClass(env, "com/eve/basejni/ClassMethod");
+    if (clazz == NULL) {
+        printf("找不到com/eve/basejni/ClassMethod");
+        return;
+    }
+
+    // 2、获取类的默认构造方法ID
+    mid_construct = (*env)->GetMethodID(env, clazz, "<init>", "()V");
+    if (mid_construct == NULL) {
+        printf("找不到构造方法");
+        return;
+    }
+
+    // 3、查找实例方法的ID
+    mid_instance = (*env)->GetMethodID(env, clazz, "CallInstanceMethod", "(ILjava/lang/String;)V");
+    if (mid_instance == NULL) {
+        printf("找不到CallInstanceMethod方法ID");
+        return;
+    }
+
+    // 4、创建该类的实例
+    jobj = (*env)->NewObject(env, clazz, mid_construct);
+    if (jobj == NULL) {
+        printf("创建不了CallInstanceMethod方法实例");
+        return;
+    }
+
+    // 5、调用对象的实例方法
+    str_arg = (*env)->NewStringUTF(env, "Hi form Instance Method");
+    (*env)->CallVoidMethod(env, jobj, mid_instance, 200, str_arg);
+    // 删除局部引用
+    (*env)->DeleteLocalRef(env, clazz);
+    (*env)->DeleteLocalRef(env, jobj);
+    (*env)->DeleteLocalRef(env, str_arg);
+}
+
+JNIEXPORT void JNICALL
+Java_com_eve_basejni_BaseUtils_CallJavaStaticMethod(JNIEnv *env, jclass cls) {
+    jclass clazz = NULL;
+    jstring str_arg = NULL;
+    jmethodID mid_static_method;
+
+    // 1、从classpath路径下搜索ClassMethod这个类，并返回该类的Class对象
+    clazz = (*env)->FindClass(env, "com/eve/basejni/ClassMethod");
+    if (clazz == NULL) {
+        printf("找不到com/eve/basejni/ClassMethod");
+        return;
+    }
+
+    // 2、从clazz类中查找callStaticMethod方法
+    mid_static_method = (*env)->GetStaticMethodID(env, clazz, "CallStaticMethod",
+                                                  "(Ljava/lang/String;I)V");
+    if (mid_static_method == NULL) {
+        printf("找不到CallStaticMethod的静态方法");
+        return;
+    }
+
+    // 3、调用clazz类的callStaticMethod静态方法
+    str_arg = (*env)->NewStringUTF(env, "This is CallStaticMethod form C");
+    (*env)->CallStaticVoidMethod(env, clazz, mid_static_method, str_arg, 100);
+
+    (*env)->DeleteLocalRef(env, clazz);
+    (*env)->DeleteLocalRef(env, str_arg);
+}
+
+JNIEXPORT void JNICALL Java_com_eve_basejni_BaseUtils_UseInstanceField(
+        JNIEnv *env, jclass cls, jobject obj) {
+    jclass clazz;
+    jfieldID fid;
+    jstring j_str;
+    jstring j_newStr;
+    const char *c_str = NULL;
+
+    // 1.获取AccessField类的Class引用
+    clazz = (*env)->GetObjectClass(env, obj);
+    if (clazz == NULL) {
+        return;
+    }
+
+    // 2. 获取AccessField类实例变量str的属性ID
+    fid = (*env)->GetFieldID(env, clazz, "str", "Ljava/lang/String;");
+    if (fid == NULL) {
+        return;
+    }
+
+    // 3. 获取实例变量str的值
+    j_str = (jstring) (*env)->GetObjectField(env, obj, fid);
+
+    // 4. 将unicode编码的java字符串转换成C风格字符串
+    c_str = (*env)->GetStringUTFChars(env, j_str, NULL);
+    if (c_str == NULL) {
+        return;
+    }
+    printf("In C--->ClassField.str = %s\n", c_str);
+    (*env)->ReleaseStringUTFChars(env, j_str, c_str);
+
+    // 5. 修改实例变量str的值
+    j_newStr = (*env)->NewStringUTF(env, "This is C String");
+    if (j_newStr == NULL) {
+        return;
+    }
+
+    (*env)->SetObjectField(env, obj, fid, j_newStr);
+
+    // 6.删除局部引用
+    (*env)->DeleteLocalRef(env, clazz);
+    (*env)->DeleteLocalRef(env, j_str);
+    (*env)->DeleteLocalRef(env, j_newStr);
+}
+
+JNIEXPORT void JNICALL Java_com_eve_basejni_BaseUtils_UseStaticField
+        (JNIEnv *env, jclass cls)
+{
+    jclass clazz;
+    jfieldID fid;
+    jint num;
+
+    //1.获取ClassField类的Class引用
+    clazz = (*env)->FindClass(env,"com/eve/basejni/ClassField");
+    if (clazz == NULL) {    // 错误处理
+        return;
+    }
+
+    //2.获取ClassField类静态变量num的属性ID
+    fid = (*env)->GetStaticFieldID(env, clazz, "num", "I");
+    if (fid == NULL) {
+        return;
+    }
+
+    // 3.获取静态变量num的值
+    num = (*env)->GetStaticIntField(env,clazz,fid);
+    printf("In C--->ClassField.num = %d\n", num);
+
+    // 4.修改静态变量num的值
+    (*env)->SetStaticIntField(env, clazz, fid, 80);
+
+    // 删除属部引用
+    (*env)->DeleteLocalRef(env,clazz);
+}

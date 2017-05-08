@@ -35,4 +35,8 @@ public class BaseUtils {
 
     public native int sumArray(int[] arr);
     public native int[][] initObjectArray(int size);
+    public static native void CallJavaStaticMethod();
+    public static native void CallJavaInstanceMethod();
+    public static native void UseInstanceField(ClassField obj);
+    public static native void UseStaticField();
 }
